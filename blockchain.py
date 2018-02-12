@@ -148,13 +148,14 @@ class Blockchain:
         for index,block in enumerate(self.chain[1:]):
             content = json.loads(block.content)
             dest = content['to']
+            amount = float(content['amount'])
             if dest not in node_accounts: # account has not been created yet
-                node_accounts[dest] = node_account(dest)
+                node_accounts[dest] = Node_account(dest)
             if 'proof' in content: # block was mined
-                node_accounts[dest].credit(float(content['amount']))
+                node_accounts[dest].credit(amount)
             elif 'proof' not in content: # transaction
-                node_accounts[dest].credit(float(content['amount']))
-                node_accounts[content['from']].debit(float(content['amount']))
+                node_accounts[dest].credit(amount)
+                node_accounts[content['from']].debit(amount)
         # transform accounts into a single dict with node_name keys and balance values
         balances = {}
         for key in node_accounts:
@@ -162,7 +163,7 @@ class Blockchain:
         return balances
 
 # class to hold blockchain accounting
-class node_account:
+class Node_account:
     def __init__(self, node_name, node_balance=0):
         self.node_name = node_name
         self.node_balance = node_balance
